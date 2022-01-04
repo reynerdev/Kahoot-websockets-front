@@ -3,18 +3,15 @@ import styled from 'styled-components'
 import { io } from "socket.io-client";
 import Modal from './Modal';
 import UserIcon from './UserIcon'
-// import useSocket from '../../customHooks/useSocket'
+import { PROCESSTYPE } from '../../utils/constants'
+import { useSocket } from '../../context/socket-context'
 
-const GAMEPIN = '2342342'
+const WaitingRoom = ({ type, codePin }) => {
 
-
-const WaitingRoom = () => {
-  // esperar 
   const [enteredName, setEnteredName] = React.useState(false);
-  const [userData, setUserData] = React.useState({})
   const [connectedUsers, setConnectedUsers] = React.useState([])
-  const [gamePin, setGamePin] = React.useState(null)
-  const [socket] = React.useState(() => io(":3030"))
+  const [gamePin, setGamePin] = React.useState(codePin)
+  const socket = useSocket()
   const [online, setOnline] = React.useState(false)
 
   console.log("Render Waiting Room")
@@ -23,17 +20,35 @@ const WaitingRoom = () => {
 
     setOnline(true);
 
-    // guard el id de room para futuro uso y retornamos los usuarios
-    socket.emit('create-new-room', {}, (data) => {
-      setGamePin(data['game-pin'])
-      setConnectedUsers(data.users)
-      console.log(data)
-    })
+
+    if (PROCESSTYPE[type] === PROCESSTYPE['CreateRoom']) {
+      // if the type is equal to createRoom then the user wont createRoom insted will joing the room
+      // guard el id de room para futuro uso y retornamos los usuarios
+      socket.emit('create-new-room', {}, (data) => {
+        setGamePin(data['game-pin'])
+        setConnectedUsers(data.users)
+        console.log(data)
+      })
+    } else {
+
+      // socket.emit('joinRoom', { codePin: codePin }, (data) => {
+
+      //   //if Room doesnt exits send a error
+
+      //   setGamePin(data['gamePin'])
+
+      // })
+
+    }
 
     socket.on('updateUsers', (data) => {
       console.log('updateUsers', data)
       setConnectedUsers(data.users)
     })
+
+    socket.on("connect_error", (error) => {
+      console.log('server connection error')
+    });
 
     return () => {
       console.log('useEffectCleanUp')
@@ -41,7 +56,8 @@ const WaitingRoom = () => {
         setOnline(false)
       })
     }
-  }, [socket])
+  }, [socket, type, codePin])
+
 
   const handleOnSubmit = (e) => {
     console.log('handleOnSubmit', e.target[0].value)
@@ -97,10 +113,10 @@ const WaitingRoom = () => {
           </span>
         </div>
         <div className='list-users'>
-          {[1, 2, 3, 4, 5, 6, 8, 9, 10, 1, 12, 3, 3, 3, 32, 32, 32].map((element, index) => <UserIcon index={index} />)}
+          {/* {[1, 2, 3, 4, 5, 6, 8, 9, 10, 1, 12, 3, 3, 3, 32, 32, 32].map((element, index) => <UserIcon index={index} />)} */}
 
+          {connectedUsers.map(element => <UserIcon userName={element.userName} />)}
         </div>
-        {/* {connectedUsers.map(element => <p>{element.userName}</p>)} */}
       </div>
     </GridContainer>
   )

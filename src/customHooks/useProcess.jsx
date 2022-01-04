@@ -6,14 +6,20 @@ import { PROCESSTYPE } from '../utils/constants'
 
 const useProcess = () => {
   const [process, setProcess] = React.useState(PROCESSTYPE['Main'])
+  const [enterCode, setEnterCode] = React.useState('');
+
   let component;
   switch (process) {
     case 'Main':
-      component = <MainPage setProcess={setProcess} />
+      component = <MainPage setProcess={setProcess} enterCode={enterCode} setEnterCode={setEnterCode} />
       break;
 
     case 'CreateRoom':
-      component = <WaitingRoom setProcess={setProcess} />
+      component = <WaitingRoom setProcess={setProcess} type={process} />
+      break;
+
+    case 'EnterRoom':
+      component = <WaitingRoom setProcess={setProcess} type={process} codePin={enterCode} />
       break;
 
     default:

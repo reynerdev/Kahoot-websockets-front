@@ -2,14 +2,14 @@ import React from 'react'
 import styled from 'styled-components'
 
 
-const UserIcon = ({ index }) => {
+const UserIcon = ({ index, userName }) => {
 
   return (
     <UserContainer>
       <ImageContainer>
         <img alt='randonImage' src={`https://joeschmoe.io/api/v1/${index}`} />
       </ImageContainer>
-      <div class='userName'>Manuel Loza</div>
+      <div class='userName'>{userName}</div>
     </UserContainer>
   )
 }
